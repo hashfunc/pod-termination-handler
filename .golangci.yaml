@@ -12,6 +12,8 @@ linters:
           allow:
           - $gostd
           - github.com/hashfunc/pod-termination-handler
+          - github.com/IBM/fp-go
+          - k8s.io
   exclusions:
     generated: lax
     presets:
