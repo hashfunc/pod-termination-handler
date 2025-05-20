@@ -8,7 +8,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func GetConfig() E.Either[error, *rest.Config] {
+func getConfig() E.Either[error, *rest.Config] {
 	return F.Pipe1(
 		getInclusterConfig(),
 		E.OrElse(func(err error) E.Either[error, *rest.Config] {
