@@ -1,27 +1,22 @@
 package kube
 
 import (
-	E "github.com/IBM/fp-go/either"
-	F "github.com/IBM/fp-go/function"
+	"fmt"
+
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/klog/v2"
 )
 
-func getConfig() E.Either[error, *rest.Config] {
-	return F.Pipe1(
-		getInclusterConfig(),
-		E.OrElse(func(err error) E.Either[error, *rest.Config] {
-			klog.Info("use local config: %w", err)
-			return getLocalConfig()
-		}),
-	)
-}
+func GetConfig() (*rest.Config, error) {
+	config, err := rest.InClusterConfig()
+	if err == nil {
+		return config, nil
+	}
 
-func getInclusterConfig() E.Either[error, *rest.Config] {
-	return E.Eitherize0(rest.InClusterConfig)()
-}
+	config, err = clientcmd.BuildConfigFromFlags("", clientcmd.RecommendedHomeFile)
+	if err != nil {
+		return nil, fmt.Errorf("GetKubeConfig: %w", err)
+	}
 
-func getLocalConfig() E.Either[error, *rest.Config] {
-	return E.Eitherize2(clientcmd.BuildConfigFromFlags)("", clientcmd.RecommendedHomeFile)
+	return config, nil
 }

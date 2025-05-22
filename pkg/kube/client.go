@@ -1,14 +1,17 @@
 package kube
 
 import (
-	E "github.com/IBM/fp-go/either"
-	F "github.com/IBM/fp-go/function"
+	"fmt"
+
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
-func NewClient() E.Either[error, *kubernetes.Clientset] {
-	return F.Pipe1(
-		getConfig(),
-		E.Chain(E.Eitherize1(kubernetes.NewForConfig)),
-	)
+func NewClient(config *rest.Config) (*kubernetes.Clientset, error) {
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, fmt.Errorf("NewClient: %w", err)
+	}
+
+	return kubeClient, nil
 }
